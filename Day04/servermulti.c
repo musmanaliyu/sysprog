@@ -9,27 +9,23 @@
 #include <string.h>
 #include <sys/types.h>
 #include <time.h>
-#include <pthead.h>
+#include <pthread.h>
 
 void* doSomeThing(void *arg)
 {
-    unsigned long i = 0;
+    unsigned long i = 1000;
+    char buff[1025];
     pthread_t id = pthread_self();
     
     int connfd = *((int*)arg);
 
     printf("Thread Started...\n");
 
-    while(bContinue == 1)
+    int rd;
+    while(i--)
     { 
-               //ticks = time(NULL);
-                snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", cti$
-                write(connfd, sendBuff, strlen(sendBuff));
-       
-       //rd=read(fd1,buff,1024);
-       //printf("%s\n",buff);
-
-       //getch();
+       rd=read(connfd,buff,1024);
+       printf("%s\n",buff);
     }
     
     close(connfd);
@@ -43,6 +39,7 @@ int main(int argc, char *argv[])
 {
 	int listenfd = 0, connfd = 0;
 	struct sockaddr_in serv_addr;
+        pthread_t tid; 
 
 	char sendBuff[1025];
 	time_t ticks;
@@ -69,15 +66,15 @@ int main(int argc, char *argv[])
 	 * maximum number of client connections that server will queue for this listening
 	 * socket.
 	 */
-	listen(listenfd, 10);
+	
 
 	while(1)
 	{
+                listen(listenfd, 20);
 	
 		connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-
-		
-                err = pthread_create(&tid, NULL, &doSomeThing, &connfd);
+	
+                int err = pthread_create(&tid, NULL, &doSomeThing, &connfd);
 
 		sleep(1);
 	}
